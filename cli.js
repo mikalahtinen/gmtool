@@ -19,25 +19,60 @@ const url = new URL('https://statsapi.web.nhl.com/api/v1/schedule');
 url.searchParams.append('startDate', startDate.format('YYYY-MM-DD'));
 url.searchParams.append('endDate', endDate.format('YYYY-MM-DD'));
 
-
-
 fetch(url, { method: "Get" })
     .then(res => res.json())
     .then((json) => {
-        const games = parseGames(json);
-        console.log(games);
+        const teams = getGameCount(json);
+        renderGameCount(teams);
+    });
+
+// Parse all games from given json.
+const getGameCount = (json) => {
+
+    if (json.totalGames === 0) { return []; }
+    let teams = [];
+
+    json.dates.forEach((date) => {
+        date.games.forEach((game) => {
+
+            ['away','home'].forEach((key) => {
+                let found = false;
+                for(let i = 0; i < teams.length; i++) {
+                    if (teams[i].id === game.teams[key].team.id) {
+                        found = true;
+                        teams[i].games += 1;
+                        break;
+                    }
+                }
+                if (!found) {
+                    game.teams[key].team.games = 1;
+                    teams.push(game.teams[key].team);
+                }
+            })
+
+        })
     });
 
 
-// Parse all games from given json.
-const parseGames = (json) => {
-    console.log(url.toString());
-    console.log();
-    console.log(endDate.format('YYYY-MM-DD'));
-    console.log(`Total games between ${chalk.red(startDate.format('D.M.'))} - ${chalk.red(endDate.format('D.M.Y'))}: ${chalk.green(json.totalGames)}`)
+    
+    if (args[2] === 'name') {
+        return teams.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    }
+    else {
+        return teams.sort((a, b) => b.games - a.games);
+    }
 
 };
 
+// Render game count results.
+const renderGameCount = (teams) => {
+    console.log(chalk.bgWhite(chalk.black(`Games between ${chalk.bold(startDate.format('D.M.'))} - ${chalk.bold(endDate.format('D.M.Y'))}`)))
+
+    teams.forEach((team) => {
+        console.log(`${team.name}: ${chalk.red(team.games)}`);
+    });
+
+};
 
 
 // let days = 7;

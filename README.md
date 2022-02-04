@@ -1,11 +1,11 @@
-#GMTOOL
+# GMTOOL
 Cli tool for fetching NHL match count / team for specfied time perioid.
 Uses `statsapi.web.nhl.com` as source.
 
-##Usage
+## Usage
 `gmtool days startDate sort`
 
-##Example
+## Example
 `gmtool 37 2022-02-08 games`
 
 Games between 8.2. - 17.3.2022  

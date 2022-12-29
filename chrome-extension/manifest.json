@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "GMtool",
+  "description": "Hockey GM tool",
+  "version": "1.0",
+  "action": {
+    "default_popup": "gmtool.html",
+    "default_icon": "icon.png"
+  }
+}

@@ -13,11 +13,13 @@ const days              = parseInt(args[0]) > 0 ? parseInt(args[0]) : 7;
 const startDate          = moment(args[1]).isValid() ? moment(args[1]) : today;
 const endDate            = moment(startDate.clone()).add(days, 'days');
 
-const url = new URL('https://statsapi.web.nhl.com/api/v1/schedule');
+let url = new URL('https://api-web.nhle.com/v1/schedule/');
 
 // Append start and end days into URL.
-url.searchParams.append('startDate', startDate.format('YYYY-MM-DD'));
-url.searchParams.append('endDate', endDate.format('YYYY-MM-DD'));
+url += startDate.format('YYYY-MM-DD');
+
+// url.searchParams.append('startDate', startDate.format('YYYY-MM-DD'));
+// url.searchParams.append('endDate', endDate.format('YYYY-MM-DD'));
 
 fetch(url, { method: "Get" })
     .then(res => res.json())
@@ -32,21 +34,21 @@ const getGameCount = (json) => {
     if (json.totalGames === 0) { return []; }
     let teams = [];
 
-    json.dates.forEach((date) => {
+    json.gameWeek.forEach((date) => {
         date.games.forEach((game) => {
 
-            ['away','home'].forEach((key) => {
+            ['awayTeam','homeTeam'].forEach((key) => {
                 let found = false;
                 for(let i = 0; i < teams.length; i++) {
-                    if (teams[i].id === game.teams[key].team.id) {
+                    if (teams[i].id === game[key].id) {
                         found = true;
                         teams[i].games += 1;
                         break;
                     }
                 }
                 if (!found) {
-                    game.teams[key].team.games = 1;
-                    teams.push(game.teams[key].team);
+                    game[key].games = 1;
+                    teams.push(game[key]);
                 }
             })
 
@@ -69,11 +71,10 @@ const renderGameCount = (teams) => {
     console.log(chalk.bgWhite(chalk.black(`Games between ${chalk.bold(startDate.format('D.M.'))} - ${chalk.bold(endDate.format('D.M.Y'))}`)))
 
     teams.forEach((team) => {
-        console.log(`${team.name}: ${chalk.red(team.games)}`);
+        console.log(`[${team.abbrev}] ${team.placeName.default}: ${chalk.red(team.games)}`);
     });
 
 };
-
 
 // let days = 7;
 //
